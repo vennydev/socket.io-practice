@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import ScrollToBottom from "react-scroll-to-bottom";
+import "./App.css";
 
 function Chat({ socket, username, room }) {
   const [currentMessage, setCurrentMessage] = useState("");
   const [messageList, setMessageList] = useState([]);
+  const [author, setAuthor] = useState("");
 
   const sendMessage = async () => {
     if (currentMessage !== "") {
@@ -17,19 +19,20 @@ function Chat({ socket, username, room }) {
           ":" +
           new Date(Date.now()).getMinutes(),
       };
-
       // 소켓 명령어와 함께 메시지 데이터를 보낸다
-      await socket.emit("send_message", messageData);
+      await socket.emit("send_msg", messageData);
       setMessageList((list) => [...list, messageData]);
       setCurrentMessage("");
     }
   };
 
-  console.log(messageList);
+  console.log(`messageList : ${messageList}`);
+  console.log(author);
 
   useEffect(() => {
     // 서버에서 클라로 전송할 데이터 있을 시 그 데이터를 받아 차곡차곡 쌓는다
-    socket.on("receive_message", (data) => {
+    socket.on("receive_msg", (data) => {
+      console.log(data);
       setMessageList((list) => [...list, data]);
     });
   }, [socket]);
@@ -41,9 +44,12 @@ function Chat({ socket, username, room }) {
       </div>
       <div className="chat-body">
         <ScrollToBottom className="message-container">
-          {messageList.map((messageContent) => {
+          <h5 style={{ color: "green" }}>{room}번 방으로 </h5>
+          <h4 style={{ color: "green" }}>{username}님이 입장하셨습니다</h4>
+          {messageList.map((messageContent, idx) => {
             return (
               <div
+                key={idx}
                 className="message"
                 id={username === messageContent.author ? "you" : "other"}
               >
