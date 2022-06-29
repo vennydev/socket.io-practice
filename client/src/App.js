@@ -1,3 +1,4 @@
+import "./App.css";
 import io from "socket.io-client";
 import { useState } from "react";
 import Chat from "./Chat";
@@ -11,17 +12,20 @@ function App() {
 
   const joinRoom = () => {
     if (username !== "" && room !== "") {
-      console.log("채팅방 입장!");
-      // 소켓명령어(소켓을 설정한 담당자가 설정한 변수명)와 방이름(데이터)을 보낸다
-      socket.emit("join_room", room);
-      // chat을 보여주기 위한 상태 관리. false-> true로 상태값 변경
+      socket.emit("join_room", username, room);
+      socket.on("chat_list", (chat_list) => {
+        chat_list.forEach(msg_obj => {
+          msg_obj.msg.forEach(num => {
+            if(num.room === room){
+              console.log('이 방에 불러올 메시지가 있습니다.');
+            }
+          })
+      });
+        
+      });
       setShowChat(true);
     }
   };
-
-  console.log(`username : ${username}`);
-  console.log(`room : ${room}`);
-  console.log(`showChat : ${showChat}`);
 
   return (
     <div className="App">
@@ -45,7 +49,12 @@ function App() {
           <button onClick={joinRoom}>채팅 입장</button>
         </div>
       ) : (
-        <Chat socket={socket} username={username} room={room} />
+        <Chat
+          socket={socket}
+          username={username}
+          room={room}
+          setShowChat={setShowChat}
+        />
       )}
     </div>
   );
