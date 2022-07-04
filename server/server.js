@@ -6,7 +6,7 @@ const router = express.Router();
 const { Server } = require("socket.io");
 const Msg = require("./schemas/messages");
 const mongoose = require("mongoose");
-mongoose.connect("mongodb://localhost:27017/chat_save", {
+mongoose.connect("mongodb://localhost:27017/chatting", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -29,7 +29,8 @@ io.on("connection", (socket) => {
   socket.on("join_room", async (username, room) => {
     socket.join(room);
     const chat_list = await Msg.find();
-    socket.emit("chat_list", chat_list);
+
+    socket.emit("chat_list", chat_list); 
     //data : 방 이름
 
     console.log(`User with ID: ${username} joined room: ${room}`);
@@ -38,29 +39,36 @@ io.on("connection", (socket) => {
 
   socket.on("send_message", (messageData) => {
     console.log("메시지: ", messageData);
-    //data: 방 이름, 쓴 사람, 메시지 내용, 작성 시간
-    socket.to(messageData.room).emit("receive_message", messageData);
+    const message = new Msg(messageData);
+    message.save().then(() => {
+      //data: 방 이름, 쓴 사람, 메시지 내용, 작성 시간
+      socket.to(messageData.room).emit("receive_message", messageData);
+    });
   });
   //방 떠나면서 채팅내역 저장하게 할것임. (조회해보고 방 정보가 같으면 그쪽 데이터를 갱신해주는 방식으로 수정해야할듯.)
   socket.on("leave_room", (room, messageList) => {
     console.log("room: ", room);
     socket.leave(room);
 
-    const message = new Msg(messageList);
-    for (let i = 0; i < messageList.length; i++) {
-      message.msg.push(messageList[i]);
-    }
-    message.save();
+    // const message = new Msg(messageList);
+    // for (let i = 0; i < messageList.length; i++) {
+    //   message.msg.push(messageList[i]);
+    // }
+    // message.save();
 
     console.log(messageList);
+  });
+
+  socket.on("change_room", (now, next) => {
+    socket.leave(now);
+    socket.join(next);
   });
 
   socket.on("disconnect", () => {
     console.log("User Disconnected", socket.id);
   });
-
 });
 
-server.listen(3001, () => {
+server.listen(3002, () => {
   console.log("SERVER RUNNING");
 });
