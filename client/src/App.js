@@ -12,11 +12,8 @@ function App() {
 
   const joinRoom = () => {
     if (username !== "" && room !== "") {
-      console.log("채팅방 입장!");
-      console.log(username, room);
-      // 소켓명령어(소켓을 설정한 담당자가 설정한 변수명)와 방이름(데이터)을 보낸다
       socket.emit("join_room", username, room);
-      // chat을 보여주기 위한 상태 관리. false-> true로 상태값 변경
+      socket.on("chat_list", (chat_list) => {});
       setShowChat(true);
     }
   };
@@ -43,7 +40,12 @@ function App() {
           <button onClick={joinRoom}>채팅 입장</button>
         </div>
       ) : (
-        <Chat socket={socket} username={username} room={room} />
+        <Chat
+          socket={socket}
+          username={username}
+          room={room}
+          setShowChat={setShowChat}
+        />
       )}
     </div>
   );
