@@ -1,8 +1,22 @@
-const http = require("./app");
-const socketIo = require("socket.io");
-const Message = require("./schemas/message");
+const express = require("express");
+const app = express();
+const http = require("http");
+const cors = require("cors");
+const router = express.Router();
+const { Server } = require("socket.io");
+const Msg = require("./schemas/messages");
+const mongoose = require("mongoose");
+mongoose.connect("mongodb://localhost:27017/chatting", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "connection error:"));
+app.use(cors());
 
-const io = socketIo(http, {
+const server = http.createServer(app);
+
+const io = new Server(server, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"],
@@ -36,12 +50,6 @@ io.on("connection", (socket) => {
     console.log("room: ", `${room}을 떠남.`);
     socket.leave(room);
 
-    // const message = new Message(messageList);
-    // for (let i = 0; i < messageList.length; i++) {
-    //   message.msg.push(messageList[i]);
-    // }
-    // message.save();
-
   });
 
   socket.on("change_room", (now, next) => {
@@ -52,4 +60,9 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("User Disconnected", socket.id);
   });
+});
+
+
+server.listen(3002, () => {
+  console.log("SERVER RUNNING");
 });
