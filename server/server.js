@@ -4,12 +4,14 @@ const Message = require("./schemas/message");
 
 const io = socketIo(http, {
   cors: {
-    origin: "*",
+    origin: "http://localhost:3000",
     methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 
 io.on("connection", (socket) => {
+
   console.log(`User Connected: ${socket.id}`); //연결에 사용되는 소켓 정보
 
   socket.on("join_room", async (username, room) => {
@@ -35,7 +37,6 @@ io.on("connection", (socket) => {
   socket.on("leave_room", (room, messageList) => {
     console.log("room: ", `${room}을 떠남.`);
     socket.leave(room);
-
     // const message = new Message(messageList);
     // for (let i = 0; i < messageList.length; i++) {
     //   message.msg.push(messageList[i]);
