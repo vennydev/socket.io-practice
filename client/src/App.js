@@ -13,16 +13,7 @@ function App() {
   const joinRoom = () => {
     if (username !== "" && room !== "") {
       socket.emit("join_room", username, room);
-      socket.on("chat_list", (chat_list) => {
-        chat_list.forEach(msg_obj => {
-          msg_obj.msg.forEach(num => {
-            if(num.room === room){
-              console.log('이 방에 불러올 메시지가 있습니다.');
-            }
-          })
-      });
-        
-      });
+      socket.on("chat_list", (chat_list) => {});
       setShowChat(true);
     }
   };

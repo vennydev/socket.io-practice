@@ -10,6 +10,7 @@ function Chat({ socket, username, room, setShowChat }) {
   const sendMessage = async () => {
     if (currentMessage !== "") {
       // 접속한 방 이름, 유저이름, 작성한 메시지, 시간을 담은 data 객체
+
       const messageData = {
         room: room,
         author: username,
@@ -26,22 +27,19 @@ function Chat({ socket, username, room, setShowChat }) {
     }
   };
   useEffect(() => {
-  socket.on(
-    "receive_message",
-    (messageData) => {
+    
+    socket.on("receive_message", (messageData) => {
       setMessageList((list) => [...list, messageData]);
-    });}
-    ,[socket]
-  );
+    });
+  }, [socket]);
 
   const leaveRoom = () => {
     console.log("leave!");
     setShowChat(false);
-    socket.emit("leave_room", room ,messageList);
+    socket.emit("leave_room", room, messageList);
   };
 
-  
-  console.log(messageList);
+  // console.log(messageList);
 
   useEffect(() => {
     socket.on("welcome_msg", (data) => {
@@ -58,7 +56,7 @@ function Chat({ socket, username, room, setShowChat }) {
         <ScrollToBottom className="message-container">
           <h5 style={{ color: "green" }}>{room}번 방으로 </h5>
           <h4 style={{ color: "green" }}>{username}님이 입장하셨습니다</h4>
-          
+
           {messageList.map((messageContent, idx) => {
             return (
               <div
@@ -94,7 +92,7 @@ function Chat({ socket, username, room, setShowChat }) {
         />
         <button onClick={sendMessage}>&#9658;</button>
       </div>
-      {/* <button onClick={leaveRoom}>방 나가기</button> */}
+      <button onClick={leaveRoom}>방 나가기</button>
     </div>
   );
 }
