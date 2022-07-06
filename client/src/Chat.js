@@ -21,7 +21,7 @@ function Chat({ socket, username, room, setShowChat }) {
           new Date(Date.now()).getMinutes(),
       };
       // 소켓 명령어와 함께 메시지 데이터를 보낸다
-      socket.emit("send_message", messageData);
+      await socket.emit("send_msg", messageData);
       setMessageList((list) => [...list, messageData]);
       setCurrentMessage("");
     }
@@ -39,11 +39,15 @@ function Chat({ socket, username, room, setShowChat }) {
     socket.emit("leave_room", room, messageList);
   };
 
-  // console.log(messageList);
+
+  console.log(`messageList : ${messageList}`);
+  console.log(author);
 
   useEffect(() => {
-    socket.on("welcome_msg", (data) => {
+    // 서버에서 클라로 전송할 데이터 있을 시 그 데이터를 받아 차곡차곡 쌓는다
+    socket.on("receive_msg", (data) => {
       console.log(data);
+      setMessageList((list) => [...list, data]);
     });
   }, [socket]);
 

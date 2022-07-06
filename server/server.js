@@ -18,12 +18,14 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: "http://localhost:3000",
     methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 
 io.on("connection", (socket) => {
+
   console.log(`User Connected: ${socket.id}`); //연결에 사용되는 소켓 정보
 
   socket.on("join_room", async (username, room) => {
@@ -49,6 +51,7 @@ io.on("connection", (socket) => {
   socket.on("leave_room", (room, messageList) => {
     console.log("room: ", `${room}을 떠남.`);
     socket.leave(room);
+
 
   });
 
