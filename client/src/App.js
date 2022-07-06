@@ -13,7 +13,9 @@ function App() {
   const joinRoom = () => {
     if (username !== "" && room !== "") {
       socket.emit("join_room", username, room);
-      socket.on("chat_list", (chat_list) => {});
+      socket.on("chat_list", (chat_list) => {
+        console.log(chat_list);
+      });
       setShowChat(true);
     }
   };

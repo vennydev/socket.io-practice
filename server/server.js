@@ -61,7 +61,9 @@ io.on("connection", (socket) => {
     console.log("User Disconnected", socket.id);
   });
 });
-
+app.get('/', (req, res) => {
+  res.send('채팅하자');
+});
 
 server.listen(3002, () => {
   console.log("SERVER RUNNING");
